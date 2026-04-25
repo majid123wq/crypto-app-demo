@@ -1,9 +1,22 @@
 [build]
-  base = "frontend"
-  publish = "frontend/build"
   command = "npm run build"
+  functions = "functions"
+  publish = "build"
+  base = "frontend"
 
+[build.environment]
+  NODE_VERSION = "18"
+  CI = "false"
+
+# Redirect all routes to index.html for React Router
 [[redirects]]
   from = "/*"
   to = "/index.html"
   status = 200
+
+# Environment variable (set via Netlify UI or netlify-cli)
+# REACT_APP_API_URL should be set to your Render backend URL
+# Example: https://crypto-app-backend-xxxxx.onrender.com/api
+
+[context.production.environment]
+  NODE_ENV = "production"

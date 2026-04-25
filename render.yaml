@@ -2,14 +2,25 @@ services:
   - type: web
     name: crypto-app-backend
     env: node
-    buildCommand: "npm install"
-    startCommand: "node server.js"
-    root: backend
     plan: free
+    region: ohio
+    buildCommand: npm install
+    startCommand: node server.js
+    root: backend
+    branch: main
+    automatedDeploys: true
     envVars:
-      - key: MONGO_URI
-        scope: private
+      - key: NODE_ENV
+        value: production
       - key: JWT_SECRET
         scope: private
+        # Generate: openssl rand -base64 32
+        # Or: [System.Convert]::ToBase64String([System.Security.Cryptography.RandomNumberGenerator]::GetBytes(32)) in PowerShell
+      - key: JWT_EXPIRE
+        value: 7d
+      - key: MONGO_URI
+        scope: private
+        # Leave empty for in-memory DB, or set to MongoDB Atlas URI
       - key: CLIENT_URL
         scope: private
+        # Set to Netlify frontend URL after deployment

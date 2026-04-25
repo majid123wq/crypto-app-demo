@@ -157,12 +157,12 @@ POST http://localhost:5000/api/crypto/seed
 ## ✅ Compliance Checklist (Netlify)
 
 - [x] Site title: "Crypto App | Student Project" (not "Coinbase")
-- [x] Warning banner at top: "STUDENT PROJECT DEMO – NOT affiliated with Coinbase"
+- [x] Warning banner at top: "STUDENT PROJECT DEMO – Not affiliated with any real exchange"
 - [x] Footer disclaimer: "Demo project – do not enter real personal information"
 - [x] Login page notice: "Demo app – do not use your real password"
 - [x] Register page notice: "Demo app – do not use your real password or personal information"
 - [x] `<meta name="robots" content="noindex, nofollow">` in index.html
-- [ ] **You must:** rename Netlify site to avoid "coinbase" in the URL
+- [ ] **You must:** rename Netlify site to avoid using real exchange names in the URL
 
 ---
 

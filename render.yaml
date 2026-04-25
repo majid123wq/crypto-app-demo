@@ -1,0 +1,15 @@
+services:
+  - type: web
+    name: crypto-app-backend
+    env: node
+    buildCommand: "npm install"
+    startCommand: "node server.js"
+    root: backend
+    plan: free
+    envVars:
+      - key: MONGO_URI
+        scope: private
+      - key: JWT_SECRET
+        scope: private
+      - key: CLIENT_URL
+        scope: private

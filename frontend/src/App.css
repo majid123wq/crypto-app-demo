@@ -1,0 +1,113 @@
+@import url('https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap');
+
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  font-size: 16px;
+  scroll-behavior: smooth;
+}
+
+body {
+  background: #0a0b0d;
+  color: #f9fafb;
+  font-family: 'Syne', sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  overflow-x: hidden;
+}
+
+.app-wrapper {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  padding-top: 40px; /* offset for DemoBanner fixed at top */
+}
+
+.main-content {
+  flex: 1;
+}
+
+/* Spinner animation */
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* Scrollbar styling */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: #0d0e11;
+}
+::-webkit-scrollbar-thumb {
+  background: #1e293b;
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #334155;
+}
+
+/* Input autofill dark fix */
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus {
+  -webkit-text-fill-color: #f9fafb;
+  -webkit-box-shadow: 0 0 0px 1000px #111318 inset;
+  transition: background-color 5000s ease-in-out 0s;
+}
+
+/* Number input arrows hide */
+input[type=number]::-webkit-inner-spin-button,
+input[type=number]::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+}
+
+/* Responsive utilities */
+@media (max-width: 640px) {
+  .hide-mobile {
+    display: none !important;
+  }
+
+  .nav-links {
+    display: none !important;
+  }
+}
+
+/* Table responsive */
+@media (max-width: 768px) {
+  table td:nth-child(5),
+  table th:nth-child(5),
+  table td:nth-child(6),
+  table th:nth-child(6) {
+    display: none;
+  }
+}
+
+@media (max-width: 480px) {
+  table td:nth-child(4),
+  table th:nth-child(4) {
+    display: none;
+  }
+}
+
+/* Focus styles */
+button:focus-visible,
+a:focus-visible,
+input:focus-visible {
+  outline: 2px solid #3b82f6;
+  outline-offset: 2px;
+}
+
+/* Smooth hover transitions */
+a, button {
+  transition: opacity 0.15s ease, transform 0.15s ease;
+}
+
+a:hover {
+  opacity: 0.85;
+}

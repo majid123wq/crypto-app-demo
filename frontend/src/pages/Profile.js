@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import api from '../utils/api';
 
 const Profile = () => {
   const { user, logout, getProfile } = useAuth();
@@ -22,7 +21,7 @@ const Profile = () => {
       }
     };
     fetchProfile();
-  }, []);
+  }, [getProfile]);
 
   const handleLogout = async () => {
     await logout();
@@ -70,7 +69,7 @@ const Profile = () => {
           background: '#111318', border: '1px solid rgba(255,255,255,0.07)',
           borderRadius: '20px', padding: '40px',
           marginBottom: '20px',
-          background: 'linear-gradient(135deg, #111318 0%, #0f1117 100%)',
+            background: 'linear-gradient(135deg, #111318 0%, #0f1117 100%)',
         }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '24px', flexWrap: 'wrap' }}>
             {/* Avatar */}

@@ -34,8 +34,7 @@ const Home = () => {
       setCryptos(normalized);
     } catch (err) {
       const errorMsg =
-        err.code === "ECONNABORTED" ||
-        err.message === "timeout of 0ms exceeded"
+        err.code === "ECONNABORTED" || err.message === "timeout of 0ms exceeded"
           ? "Backend server is still waking up. Please wait 30-60 seconds and retry."
           : err.response?.data?.message ||
             err.message ||

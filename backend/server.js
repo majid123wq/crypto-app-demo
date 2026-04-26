@@ -17,10 +17,13 @@ const allowedOrigins = new Set([
   process.env.CLIENT_URL || "http://localhost:3000",
   "http://localhost:3000",
   "http://localhost:3001",
+  "https://crypto-student.netlify.app", // Explicit Netlify site
 ]);
 
-// Add Netlify site (frontend) to allowed origins when provided
-if (process.env.CLIENT_URL) allowedOrigins.add(process.env.CLIENT_URL);
+// Add any additional CLIENT_URL if different from local defaults
+if (process.env.CLIENT_URL && !allowedOrigins.has(process.env.CLIENT_URL)) {
+  allowedOrigins.add(process.env.CLIENT_URL);
+}
 
 app.use(
   cors({
@@ -110,4 +113,30 @@ app.listen(PORT, () => {
   console.log(`  GET    http://localhost:${PORT}/api/crypto/new`);
   console.log(`  POST   http://localhost:${PORT}/api/crypto`);
   console.log(`  POST   http://localhost:${PORT}/api/crypto/seed (dev only)\n`);
+
+  // Keep-alive for Render free tier (prevent cold starts)
+  // Ping self every 14 minutes to stay warm
+  if (process.env.NODE_ENV === "production") {
+    const https = require("https");
+    const backendUrl =
+      process.env.RENDER_URL || "https://crypto-app-demo.onrender.com";
+    setInterval(
+      () => {
+        https
+          .get(backendUrl, (res) => {
+            console.log(`[Keep-alive] Render self-ping: ${res.statusCode}`);
+          })
+          .on("error", (err) => {
+            console.error(
+              `[Keep-alive] Self-ping error (expected):`,
+              err.message,
+            );
+          });
+      },
+      14 * 60 * 1000,
+    ); // 14 minutes
+    console.log(
+      `\n⏱️  Keep-alive ping scheduled every 14 minutes to prevent cold starts`,
+    );
+  }
 });

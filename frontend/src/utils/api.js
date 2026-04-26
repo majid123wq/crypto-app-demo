@@ -1,7 +1,8 @@
 import axios from "axios";
 
+// replace generic fallback with the real demo backend so Netlify builds without REACT_APP_API_URL still work
 const API_BASE =
-  process.env.REACT_APP_API_URL || "https://your-backend.onrender.com/api";
+  process.env.REACT_APP_API_URL || "https://crypto-app-demo.onrender.com/api";
 
 const api = axios.create({
   baseURL: API_BASE,

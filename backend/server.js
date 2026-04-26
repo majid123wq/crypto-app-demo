@@ -13,12 +13,14 @@ connectDB();
 const app = express();
 
 // CORS configuration
-const allowedOrigins = new Set([
-  process.env.CLIENT_URL || "http://localhost:3000",
-  "http://localhost:3000",
-  "http://localhost:3001",
-  "https://crypto-student.netlify.app", // Explicit Netlify site
-]);
+const allowedOrigins = new Set(
+  [
+    "http://localhost:3000",
+    "http://localhost:3001",
+    "https://crypto-student.netlify.app", // hardcoded — never remove
+    process.env.CLIENT_URL,
+  ].filter(Boolean),
+);
 
 // Add any additional CLIENT_URL if different from local defaults
 if (process.env.CLIENT_URL && !allowedOrigins.has(process.env.CLIENT_URL)) {

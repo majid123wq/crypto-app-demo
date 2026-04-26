@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import CryptoTable from "../components/CryptoTable";
 import api from "../utils/api";
+import axios from "axios"; // add if not already imported
 
 const Home = () => {
   const [cryptos, setCryptos] = useState([]);
@@ -47,7 +48,33 @@ const Home = () => {
   };
 
   useEffect(() => {
-    fetchCryptos();
+    const loadCryptos = async () => {
+      try {
+        const res = await api.get("/crypto"); // existing fetch
+        const list = res.data || [];
+        if (Array.isArray(list) && list.length === 0) {
+          // seed once on the demo backend, then re-fetch
+          await axios.post(
+            "https://crypto-app-demo.onrender.com/api/crypto/seed",
+          );
+          const retry = await api.get("/crypto");
+          setCryptos(retry.data || []);
+        } else {
+          setCryptos(list);
+        }
+      } catch (err) {
+        const errorMsg =
+          err.code === "ECONNABORTED" ||
+          err.message === "timeout of 0ms exceeded"
+            ? "Backend server is still waking up. Please wait 30-60 seconds and retry."
+            : err.response?.data?.message ||
+              err.message ||
+              "Failed to load market data. Check backend is running.";
+        setError(errorMsg);
+        console.error("Fetch cryptos error:", err);
+      }
+    };
+    loadCryptos();
   }, []);
 
   const handleSeed = async () => {

@@ -15,6 +15,8 @@ const { execSync } = require("child_process");
 
 const renderKey = process.env.RENDER_KEY || "";
 const netlifyToken = process.env.NETLIFY_AUTH_TOKEN || "";
+// Allow using an existing Render service id instead of creating a new one
+const renderServiceId = process.env.RENDER_SERVICE_ID || process.argv[2] || "";
 
 if (!renderKey || !netlifyToken) {
   console.error("❌ Missing environment variables!");
@@ -104,6 +106,43 @@ async function createRenderService() {
 }
 
 /**
+ * Set environment variables on an existing Render service
+ * Run locally with: RENDER_KEY and RENDER_SERVICE_ID set in your env
+ */
+async function setRenderEnvVars(serviceId) {
+  console.log(`🔧 Setting env vars on Render service ${serviceId}...`);
+  const options = {
+    hostname: "api.render.com",
+    path: `/v1/services/${serviceId}/env-vars`,
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${renderKey}`,
+      "Content-Type": "application/json",
+    },
+  };
+
+  const envVars = [
+    { key: "NODE_ENV", value: "production", secure: false },
+    { key: "JWT_SECRET", value: "change_me_generated_locally", secure: true },
+    { key: "JWT_EXPIRE", value: "7d", secure: false },
+    { key: "CLIENT_URL", value: "", secure: false },
+  ];
+
+  try {
+    const res = await request(options, envVars);
+    if (res.status === 201 || res.status === 200) {
+      console.log(`✅ Env vars set on Render service ${serviceId}`);
+      return true;
+    }
+    console.error(`❌ Render env-vars API returned ${res.status}:`, res.data);
+    return false;
+  } catch (err) {
+    console.error("❌ Render env-vars request failed:", err.message);
+    return false;
+  }
+}
+
+/**
  * Create Netlify Site (via CLI)
  */
 async function createNetlifySite() {
@@ -143,8 +182,17 @@ async function createNetlifySite() {
  */
 async function deploy() {
   try {
-    const render = await createRenderService();
-    if (!render) throw new Error("Render deployment failed");
+    let render = null;
+    if (renderServiceId) {
+      console.log(`Using provided Render service id: ${renderServiceId}`);
+      const ok = await setRenderEnvVars(renderServiceId);
+      if (!ok)
+        throw new Error("Failed to set env vars on provided Render service");
+      render = { id: renderServiceId, domain: "<your-render-domain>" };
+    } else {
+      render = await createRenderService();
+      if (!render) throw new Error("Render deployment failed");
+    }
 
     const netlify = await createNetlifySite();
     if (!netlify) throw new Error("Netlify deployment failed");

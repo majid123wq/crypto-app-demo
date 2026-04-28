@@ -1,5 +1,6 @@
-import React, { createContext, useContext, useState, useEffect } from "react";
+import React, { createContext, useContext, useState, useEffect, useMemo } from "react";
 import api from "../utils/api";
+import PropTypes from "prop-types";
 
 const AuthContext = createContext(null);
 
@@ -15,6 +16,9 @@ export const AuthProvider = ({ children }) => {
         const res = await api.get("/auth/profile");
         setUser(res.data.user);
       } catch (err) {
+        if (err.response?.status !== 401) {
+          console.error("Auth bootstrap error:", err);
+        }
         setUser(null);
       } finally {
         setLoading(false);
@@ -26,11 +30,9 @@ export const AuthProvider = ({ children }) => {
   const register = async (name, email, password) => {
     setError(null);
     try {
-      await api.post("/auth/register", { name, email, password });
-      // server sets httpOnly cookie; fetch profile
-      const profile = await api.get("/auth/profile");
-      setUser(profile.data.user);
-      return profile.data.user;
+      const res = await api.post("/auth/register", { name, email, password });
+      setUser(res.data.user);
+      return res.data.user;
     } catch (err) {
       setError(err.response?.data?.message || "Registration failed");
       throw err;
@@ -40,10 +42,9 @@ export const AuthProvider = ({ children }) => {
   const login = async (email, password) => {
     setError(null);
     try {
-      await api.post("/auth/login", { email, password });
-      const profile = await api.get("/auth/profile");
-      setUser(profile.data.user);
-      return profile.data.user;
+      const res = await api.post("/auth/login", { email, password });
+      setUser(res.data.user);
+      return res.data.user;
     } catch (err) {
       setError(err.response?.data?.message || "Login failed");
       throw err;
@@ -53,8 +54,8 @@ export const AuthProvider = ({ children }) => {
   const logout = async () => {
     try {
       await api.post("/auth/logout");
-    } catch (e) {
-      // ignore
+    } catch (error) {
+      console.error("Logout error:", error);
     }
     setUser(null);
   };
@@ -65,13 +66,16 @@ export const AuthProvider = ({ children }) => {
     return res.data.user;
   };
 
-  return (
-    <AuthContext.Provider
-      value={{ user, loading, error, register, login, logout, getProfile }}
-    >
-      {children}
-    </AuthContext.Provider>
+  const value = useMemo(
+    () => ({ user, loading, error, register, login, logout, getProfile }),
+    [user, loading, error],
   );
+
+  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
+};
+
+AuthProvider.propTypes = {
+  children: PropTypes.node.isRequired,
 };
 
 export const useAuth = () => {

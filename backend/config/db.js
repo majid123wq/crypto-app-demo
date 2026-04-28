@@ -9,8 +9,6 @@ const sampleData = [
     price: 67432.5,
     image: "",
     change24h: 2.34,
-    marketCap: 1320000000000,
-    volume24h: 28000000000,
   },
   {
     name: "Ethereum",
@@ -18,8 +16,6 @@ const sampleData = [
     price: 3521.8,
     image: "",
     change24h: 1.87,
-    marketCap: 423000000000,
-    volume24h: 15000000000,
   },
   {
     name: "Solana",
@@ -27,8 +23,6 @@ const sampleData = [
     price: 182.4,
     image: "",
     change24h: 5.62,
-    marketCap: 81000000000,
-    volume24h: 4200000000,
   },
   {
     name: "BNB",
@@ -36,8 +30,6 @@ const sampleData = [
     price: 598.2,
     image: "",
     change24h: 0.95,
-    marketCap: 89000000000,
-    volume24h: 2100000000,
   },
   {
     name: "XRP",
@@ -45,8 +37,6 @@ const sampleData = [
     price: 0.6234,
     image: "",
     change24h: -1.23,
-    marketCap: 35000000000,
-    volume24h: 1800000000,
   },
 ];
 

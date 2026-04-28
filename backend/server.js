@@ -12,49 +12,9 @@ connectDB();
 
 const app = express();
 
-// CORS configuration
-const allowedOrigins = new Set(
-  [
-    "http://localhost:3000",
-    "http://localhost:3001",
-    "https://crypto-student.netlify.app", // hardcoded — never remove
-    process.env.CLIENT_URL,
-  ].filter(Boolean),
-);
-
-// Add any additional CLIENT_URL if different from local defaults
-if (process.env.CLIENT_URL && !allowedOrigins.has(process.env.CLIENT_URL)) {
-  allowedOrigins.add(process.env.CLIENT_URL);
-}
-
 app.use(
   cors({
-    origin: function (origin, callback) {
-      // Allow requests with no origin (curl, mobile apps)
-      if (!origin) return callback(null, true);
-      try {
-        const url = new URL(origin);
-        const hostname = url.hostname;
-        // Allow known hosting domains or the configured client URL
-        if (
-          allowedOrigins.has(origin) ||
-          allowedOrigins.has(`${url.protocol}//${hostname}`) ||
-          hostname.endsWith("netlify.app") ||
-          hostname.endsWith("render.com") ||
-          hostname.endsWith("vercel.app")
-        ) {
-          return callback(null, true);
-        }
-      } catch (e) {
-        // If parsing fails, allow only if exact match
-        if (allowedOrigins.has(origin)) return callback(null, true);
-      }
-      // In production, be strict; in development allow localhost
-      if (process.env.NODE_ENV !== "production") return callback(null, true);
-      return callback(
-        new Error("CORS policy: This origin is not allowed: " + origin),
-      );
-    },
+    origin: process.env.CLIENT_URL || "http://localhost:3000",
     credentials: true,
   }),
 );
@@ -119,7 +79,7 @@ app.listen(PORT, () => {
   // Keep-alive for Render free tier (prevent cold starts)
   // Ping self every 14 minutes to stay warm
   if (process.env.NODE_ENV === "production") {
-    const https = require("https");
+    const https = require("node:https");
     const backendUrl =
       process.env.RENDER_URL || "https://crypto-app-demo.onrender.com";
     setInterval(

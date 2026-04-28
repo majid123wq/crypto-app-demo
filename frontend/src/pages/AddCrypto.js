@@ -27,11 +27,9 @@ const AddCrypto = () => {
       const payload = {
         name: formData.name,
         symbol: formData.symbol,
-        price: parseFloat(formData.price),
+        price: Number.parseFloat(formData.price),
         image: formData.image,
-        change24h: parseFloat(formData.change24h),
-        marketCap: formData.marketCap ? parseFloat(formData.marketCap) : 0,
-        volume24h: formData.volume24h ? parseFloat(formData.volume24h) : 0,
+        change24h: Number.parseFloat(formData.change24h),
       };
       const res = await api.post('/crypto', payload);
       setSuccess(`✅ ${res.data.data.name} (${res.data.data.symbol}) added successfully!`);
@@ -48,9 +46,7 @@ const AddCrypto = () => {
     { name: 'symbol', label: 'Symbol', type: 'text', placeholder: 'e.g. BTC', required: true },
     { name: 'price', label: 'Price (USD)', type: 'number', placeholder: 'e.g. 67432.50', required: true, min: '0', step: 'any' },
     { name: 'change24h', label: '24h Change (%)', type: 'number', placeholder: 'e.g. +2.5 or -1.3', required: true, step: 'any' },
-    { name: 'image', label: 'Image URL (optional)', type: 'url', placeholder: 'https://...' },
-    { name: 'marketCap', label: 'Market Cap (USD, optional)', type: 'number', placeholder: 'e.g. 1320000000000', min: '0', step: 'any' },
-    { name: 'volume24h', label: '24h Volume (USD, optional)', type: 'number', placeholder: 'e.g. 28000000000', min: '0', step: 'any' },
+    { name: 'image', label: 'Image URL', type: 'url', placeholder: 'https://...', required: true },
   ];
 
   return (

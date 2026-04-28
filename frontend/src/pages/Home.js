@@ -2,7 +2,6 @@ import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import CryptoTable from "../components/CryptoTable";
 import api from "../utils/api";
-import axios from "axios"; // add if not already imported
 
 const Home = () => {
   const [cryptos, setCryptos] = useState([]);
@@ -15,24 +14,9 @@ const Home = () => {
     try {
       setLoading(true);
       setError(null);
-      // Use backend market endpoint which aggregates live prices (CoinGecko)
-      const res = await api.get("/market");
-      const data = res.data.data || [];
-      // normalize to expected frontend schema
-      const normalized = data.map((c) => ({
-        _id: c.id || c.symbol || Math.random().toString(36).slice(2, 9),
-        name: c.name,
-        symbol: (c.symbol || "").toUpperCase(),
-        price: c.price || c.current_price || 0,
-        image: c.image || "",
-        change24h:
-          c.change24h !== undefined
-            ? c.change24h
-            : c.price_change_percentage_24h || 0,
-        marketCap: c.marketCap || c.market_cap || 0,
-        volume24h: c.volume24h || c.total_volume || 0,
-      }));
-      setCryptos(normalized);
+      const res = await api.get("/crypto");
+      const data = res.data.data || res.data || [];
+      setCryptos(Array.isArray(data) ? data : []);
     } catch (err) {
       const errorMsg =
         err.code === "ECONNABORTED" || err.message === "timeout of 0ms exceeded"
@@ -50,17 +34,17 @@ const Home = () => {
   useEffect(() => {
     const loadCryptos = async () => {
       try {
-        const res = await api.get("/crypto"); // existing fetch
-        const list = res.data || [];
+        setLoading(true);
+        setError(null);
+        const res = await api.get("/crypto");
+        const list = res.data.data || res.data || [];
         if (Array.isArray(list) && list.length === 0) {
-          // seed once on the demo backend, then re-fetch
-          await axios.post(
-            "https://crypto-app-demo.onrender.com/api/crypto/seed",
-          );
+          await api.post("/crypto/seed");
           const retry = await api.get("/crypto");
-          setCryptos(retry.data || []);
+          const seededList = retry.data.data || retry.data || [];
+          setCryptos(Array.isArray(seededList) ? seededList : []);
         } else {
-          setCryptos(list);
+          setCryptos(Array.isArray(list) ? list : []);
         }
       } catch (err) {
         const errorMsg =
@@ -72,6 +56,8 @@ const Home = () => {
               "Failed to load market data. Check backend is running.";
         setError(errorMsg);
         console.error("Fetch cryptos error:", err);
+      } finally {
+        setLoading(false);
       }
     };
     loadCryptos();

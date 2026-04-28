@@ -28,14 +28,6 @@ const CryptoSchema = new mongoose.Schema(
       required: [true, '24h change is required'],
       default: 0,
     },
-    marketCap: {
-      type: Number,
-      default: 0,
-    },
-    volume24h: {
-      type: Number,
-      default: 0,
-    },
   },
   { timestamps: true }
 );

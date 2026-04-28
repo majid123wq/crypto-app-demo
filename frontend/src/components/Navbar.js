@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 
@@ -77,6 +77,7 @@ const Navbar = () => {
           { to: "/", label: "Markets" },
           { to: "/gainers", label: "Gainers" },
           { to: "/new-listings", label: "New" },
+          ...(user ? [{ to: "/add-crypto", label: "Add Crypto" }] : []),
         ].map((link) => (
           <Link
             key={link.to}

@@ -12,29 +12,25 @@ const Profile = () => {
   useEffect(() => {
     const fetchProfile = async () => {
       try {
-        const data = await getProfile();
-        setProfileData(data);
+        if (user) {
+          setProfileData(user);
+        } else {
+          const data = await getProfile();
+          setProfileData(data);
+        }
       } catch (err) {
+        console.error("Profile load error:", err);
         setError("Failed to load profile. Please sign in again.");
       } finally {
         setLoading(false);
       }
     };
     fetchProfile();
-  }, [getProfile]);
+  }, [getProfile, user]);
 
   const handleLogout = async () => {
     await logout();
     navigate("/login");
-  };
-
-  const formatDate = (dateStr) => {
-    if (!dateStr) return "—";
-    return new Date(dateStr).toLocaleDateString("en-US", {
-      year: "numeric",
-      month: "long",
-      day: "numeric",
-    });
   };
 
   if (loading) {
@@ -103,7 +99,6 @@ const Profile = () => {
         {/* Profile header card */}
         <div
           style={{
-            background: "#111318",
             border: "1px solid rgba(255,255,255,0.07)",
             borderRadius: "20px",
             padding: "40px",
@@ -136,7 +131,7 @@ const Profile = () => {
                 boxShadow: "0 0 0 4px rgba(59,130,246,0.15)",
               }}
             >
-              {displayData?.name?.charAt(0).toUpperCase()}
+              {displayData?.name?.charAt(0).toUpperCase() || "U"}
             </div>
             <div style={{ flex: 1 }}>
               <h1
@@ -176,7 +171,7 @@ const Profile = () => {
                   letterSpacing: "0.06em",
                 }}
               >
-                {displayData?.role || "User"}
+                User
               </span>
             </div>
           </div>
@@ -209,16 +204,6 @@ const Profile = () => {
           {[
             { label: "Full Name", value: displayData?.name },
             { label: "Email Address", value: displayData?.email },
-            { label: "Account ID", value: displayData?._id, mono: true },
-            { label: "Role", value: displayData?.role || "user" },
-            {
-              label: "Member Since",
-              value: formatDate(displayData?.createdAt),
-            },
-            {
-              label: "Last Updated",
-              value: formatDate(displayData?.updatedAt),
-            },
           ].map((item) => (
             <div
               key={item.label}

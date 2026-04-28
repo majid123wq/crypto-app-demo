@@ -13,10 +13,10 @@ const sendTokenResponse = (user, statusCode, res) => {
   const token = generateToken(user._id);
 
   const cookieOptions = {
-    expires: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // 7 days
     httpOnly: true,
-    sameSite: 'None',
     secure: process.env.NODE_ENV === 'production',
+    sameSite: process.env.NODE_ENV === 'production' ? 'None' : 'Lax',
+    maxAge: 7 * 24 * 60 * 60 * 1000,
   };
 
   res
@@ -26,11 +26,9 @@ const sendTokenResponse = (user, statusCode, res) => {
       success: true,
       token,
       user: {
-        _id: user._id,
+        id: user._id,
         name: user.name,
         email: user.email,
-        role: user.role,
-        createdAt: user.createdAt,
       },
     });
 };
@@ -96,19 +94,19 @@ const login = async (req, res) => {
 // @access  Private
 const getProfile = async (req, res) => {
   try {
-    const user = await User.findById(req.user._id);
+    const user = await User.findById(req.user._id || req.user.id).select('name email');
+    if (!user) {
+      return res.status(404).json({ success: false, message: 'User not found.' });
+    }
     res.status(200).json({
       success: true,
       user: {
-        _id: user._id,
         name: user.name,
         email: user.email,
-        role: user.role,
-        createdAt: user.createdAt,
-        updatedAt: user.updatedAt,
       },
     });
   } catch (error) {
+    console.error('Profile error:', error);
     res.status(500).json({ success: false, message: 'Server error fetching profile.' });
   }
 };
@@ -120,10 +118,10 @@ const logout = async (req, res) => {
   res
     .status(200)
     .cookie('token', '', {
-      expires: new Date(0),
       httpOnly: true,
-      sameSite: 'None',
+      sameSite: process.env.NODE_ENV === 'production' ? 'None' : 'Lax',
       secure: process.env.NODE_ENV === 'production',
+      maxAge: 0,
     })
     .json({ success: true, message: 'Logged out successfully.' });
 };
